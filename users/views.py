@@ -39,23 +39,22 @@ class UserDetailView(APIView):
 
     def put(self, request, user_id):
         user = get_object_or_404(MyUser, id=user_id)
-        #user_ = self.id
-        #print(request.user)
-        #print(user_)
-        #print(user)
-        #if user == self.user:
-        serializer = UserSerializer(user, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        if user == request.user:
+            serializer = UserSerializer(user, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        #else:
-        #    return Response({"message":"유저가 달라요."}, status=status.HTTP_400_BAD_REQUEST)
+           return Response({"message":"유저가 달라요."}, status=status.HTTP_400_BAD_REQUEST)
 
 
     def delete(self, request, user_id):
         user = get_object_or_404(MyUser, id=user_id)
-        user.delete()
-        return Response("삭제되었습니다.", status=status.HTTP_200_OK)
+        if user == request.user:
+            user.delete()
+            return Response("삭제되었습니다.", status=status.HTTP_200_OK)
+        else:
+           return Response({"message":"유저가 달라요."}, status=status.HTTP_400_BAD_REQUEST)
 
