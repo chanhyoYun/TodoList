@@ -5,6 +5,7 @@ from rest_framework import status
 from works.models import ToDoList
 from rest_framework.generics import get_object_or_404
 from users.models import MyUser
+from datetime import datetime
 
 
 class ToDoListView(APIView):
@@ -27,11 +28,17 @@ class ToDoListDetailView(APIView):
         work = get_object_or_404(ToDoList, pk=work_id)
         if work.user == request.user:
             serializer = ToDoSerializer(work, data=request.data)
+            
             if serializer.is_valid():
-                serializer.save()
+                if serializer.validated_data.get("is_complete") == True:
+                    work.completion_at = datetime.now().date()
+                    serializer.save()
+                else:
+                    serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
         else:
             return Response({"message":"유저가 달라요."}, status=status.HTTP_400_BAD_REQUEST)
         

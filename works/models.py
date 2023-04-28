@@ -8,7 +8,7 @@ class ToDoList(models.Model):
     is_complete = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    completion_at = models.DateField(auto_now=True)
+    completion_at = models.DateField(blank=True)
 
     def __str__(self):
         return str(self.title)
